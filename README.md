@@ -49,8 +49,8 @@ cmake --build . --parallel
 
 ## Todo
 
-- [ ] Add ONNXRuntime
-- [ ] Add OpenCV
+- [x] Add ONNXRuntime inference
+- [ ] Add OpenCV inference
 
 ## References
 

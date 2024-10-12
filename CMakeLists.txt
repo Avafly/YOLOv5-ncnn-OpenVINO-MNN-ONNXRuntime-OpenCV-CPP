@@ -34,8 +34,8 @@ set(MNN_INCLUDE_DIR "${CUSTOM_PATH}/MNN/build/install/include")
 set(MNN_LIB "${MNN_LIB_DIR}/libMNN.a")
 
 # ONNX Runtime
-set(ORT_LIB_DIR "${HOMEBREW_PATH}/onnxruntime/lib")
-set(ORT_INCLUDE_DIR "${HOMEBREW_PATH}/onnxruntime/include/onnxruntime")
+set(ORT_LIB_DIR "${CUSTOM_PATH}/onnxruntime/onnxruntime-osx-arm64-1.19.2/lib")
+set(ORT_INCLUDE_DIR "${CUSTOM_PATH}/onnxruntime/onnxruntime-osx-arm64-1.19.2/include")
 set(ORT_LIB "${ORT_LIB_DIR}/libonnxruntime.dylib")
 
 # Find OpenVINO

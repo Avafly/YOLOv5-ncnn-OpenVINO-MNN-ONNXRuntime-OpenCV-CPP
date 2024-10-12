@@ -5,7 +5,7 @@
             "ncnn", "OpenVINO", "MNN", "ONNXRuntime", "OpenCV"
         ],
         // [0] ncnn [1] OpenVINO [2] MNN [3] ONNXRuntime [4] OpenCV
-        "Framework": 0
+        "Framework": 3
     },
     "Camera": {
         "CameraID": 1,
@@ -14,11 +14,11 @@
         "FPS": 30
     },
     "Image": {
-        "ImagePath": "../bus.jpg"
+        "ImagePath": "../input.jpg"
     },
     "YOLOv5": {
         "ModelName": "yolov5n",
-        "ConfThreshold": 0.3,
+        "ConfThreshold": 0.4,
         "NMSThreshold": 0.45,
         "TargetSize": 640,
         "MaxStride": 32,

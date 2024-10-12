@@ -11,6 +11,7 @@
 #include "detectors/ncnn_detector.hpp"
 #include "detectors/ov_detector.hpp"
 #include "detectors/mnn_detector.hpp"
+#include "detectors/ort_detector.hpp"
 
 int main (int argc, char *argv[])
 {
@@ -69,6 +70,9 @@ int main (int argc, char *argv[])
             break;
         case 2:
             detector = std::make_unique<Infer::MNNDetector>();
+            break;
+        case 3:
+            detector = std::make_unique<Infer::ORTDetector>();
             break;
         default:
             std::cout << "Unknown model: " << framework << "\n";
