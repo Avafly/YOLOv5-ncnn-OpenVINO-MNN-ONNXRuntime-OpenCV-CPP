@@ -21,82 +21,51 @@ std::vector<Object> NCNNDetector::Detect(const cv::Mat &bgr)
     // --- Preprocessing
     int img_rows = bgr.rows;
     int img_cols = bgr.cols;
-    float scale = 1.0f;
-    int scaled_rows = img_rows;
-    int scaled_cols = img_cols;
-    if (scaled_rows > scaled_cols)
-    {
-        scale = static_cast<float>(target_size_) / scaled_rows;
-        scaled_rows = target_size_;
-        scaled_cols = scaled_cols * scale;
-    }
-    else
-    {
-        scale = static_cast<float>(target_size_) / scaled_cols;
-        scaled_cols = target_size_;
-        scaled_rows = scaled_rows * scale;
-    }
-    int pad_rows = (scaled_rows + max_stride_ - 1) / max_stride_ *
-        max_stride_ - scaled_rows;
-    int pad_cols = (scaled_cols + max_stride_ - 1) / max_stride_ *
-        max_stride_ - scaled_cols;
+    float scale;
+    int resize_rows, resize_cols, pad_rows, pad_cols;
+    GetLetterboxDimensions(
+        img_rows, img_cols, true,
+        resize_rows, resize_cols, pad_rows, pad_cols, scale
+    );
     // letterbox
-    ncnn::Mat resized = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR2RGB, img_cols, img_rows, scaled_cols, scaled_rows);
-    ncnn::Mat resized_pad;
+    ncnn::Mat resized = ncnn::Mat::from_pixels_resize(
+        bgr.data, ncnn::Mat::PIXEL_BGR2RGB, img_cols, img_rows, resize_cols, resize_rows
+    );
+    ncnn::Mat letterbox;
     ncnn::copy_make_border(
-        resized, resized_pad,
+        resized, letterbox,
         pad_rows / 2, pad_rows - pad_rows / 2,
         pad_cols / 2, pad_cols - pad_cols / 2,
         ncnn::BORDER_CONSTANT, 114.0f
     );
     const float norm_values[3] = {1 / 255.0f, 1 / 255.0f, 1 / 255.0f};
-    resized_pad.substract_mean_normalize(0, norm_values);
+    letterbox.substract_mean_normalize(0, norm_values);
 
     // --- Model inference
     std::vector<Object> proposals, objects;
 
     ncnn::Extractor ex = net_.create_extractor();
-    ex.input("in0", resized_pad);
+    ex.input("in0", letterbox);
 
-    int stride;
-    // stride 8
+    const char *blob_names[] = {"out0", "out1", "out2"};
+    for (size_t i = 0; i < strides_.size(); ++i)
     {
-        ncnn::Mat out8;
-        ex.extract("out0", out8);
-        std::vector<Object> proposals8;
-        stride = 8;
-        GenerateProposals(out8, stride, anchors8_, proposals8);
-        proposals.insert(proposals.end(), proposals8.begin(), proposals8.end());
-    }
-    // stride 16
-    {
-        ncnn::Mat out16;
-        ex.extract("out1", out16);
-        std::vector<Object> proposals16;
-        stride = 16;
-        GenerateProposals(out16, stride, anchors16_, proposals16);
-        proposals.insert(proposals.end(), proposals16.begin(), proposals16.end());
-    }
-    // stride 32
-    {
-        ncnn::Mat out32;
-        ex.extract("out2", out32);
-        std::vector<Object> proposals32;
-        stride = 32;
-        GenerateProposals(out32, stride, anchors32_, proposals32);
-        proposals.insert(proposals.end(), proposals32.begin(), proposals32.end());
+        ncnn::Mat out;
+        ex.extract(blob_names[i], out);
+        std::vector<Object> temp;
+        GenerateProposals(out, strides_[i], anchors_[i], temp);
+        proposals.insert(proposals.end(), temp.begin(), temp.end());
     }
 
     // --- Postprocessing
-    NMS(proposals, objects, img_rows, img_cols,
-        pad_rows / 2, pad_cols / 2, scale, scale);
+    NMS(proposals, objects, img_rows, img_cols, pad_rows / 2, pad_cols / 2, scale, scale);
 
     return objects;
 }
 
 bool NCNNDetector::Initialize(const int threads, const std::string &model_path,
         const float conf_thres, const float nms_thres,
-        const int target_size, const int max_stride)
+        const int target_size, const int max_stride, const int num_class)
 {
     net_.opt.num_threads = threads;
 
@@ -108,6 +77,7 @@ bool NCNNDetector::Initialize(const int threads, const std::string &model_path,
     nms_thres_ = nms_thres;
     target_size_ = target_size;
     max_stride_ = max_stride;
+    num_class_ = num_class;
 
     isInited_ = true;
     return true;
@@ -180,55 +150,6 @@ void NCNNDetector::GenerateProposals(const ncnn::Mat &feat_blob, int stride,
                 }
             }
         }
-    }
-}
-
-void NCNNDetector::NMS(std::vector<Object> &proposals, std::vector<Object> &objects, int orig_h, int orig_w,
-    float dh, float dw, float ratio_h, float ratio_w)
-{
-    objects.clear();
-    std::vector<cv::Rect> boxes;
-    std::vector<float> scores;
-    std::vector<int> labels;
-    std::vector<int> indices;
-
-    for (const auto &prop : proposals)
-    {
-        boxes.emplace_back(prop.rect);
-        scores.emplace_back(prop.prob);
-        labels.emplace_back(prop.label);
-    }
-
-    cv::dnn::NMSBoxes(boxes, scores, conf_thres_, nms_thres_, indices);
-
-    for (const auto i : indices)
-    {
-        const auto &box = boxes[i];
-        float x0 = box.x;
-        float y0 = box.y;
-        float x1 = box.x + box.width;
-        float y1 = box.y + box.height;
-        const float &score = scores[i];
-        const int &label = labels[i];
-
-        x0 = (x0 - dw) / ratio_w;
-        y0 = (y0 - dh) / ratio_h;
-        x1 = (x1 - dw) / ratio_w;
-        y1 = (y1 - dh) / ratio_h;
-
-        x0 = Clamp(x0, 0.0f, static_cast<float>(orig_w));
-        y0 = Clamp(y0, 0.0f, static_cast<float>(orig_h));
-        x1 = Clamp(x1, 0.0f, static_cast<float>(orig_w));
-        y1 = Clamp(y1, 0.0f, static_cast<float>(orig_h));
-
-        Object obj;
-        obj.rect.x = x0;
-        obj.rect.y = y0;
-        obj.rect.width = x1 - x0;
-        obj.rect.height = y1 - y0;
-        obj.prob = score;
-        obj.label = label;
-        objects.emplace_back(obj);
     }
 }
 

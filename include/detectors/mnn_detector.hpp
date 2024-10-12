@@ -21,17 +21,11 @@ public:
     std::vector<Object> Detect(const cv::Mat &bgr) override;
     bool Initialize(const int threads, const std::string &model_path,
         const float conf_thres, const float nms_thres,
-        const int target_size, const int max_stride) override;
+        const int target_size, const int max_stride, const int num_class) override;
 
 private:
     std::unique_ptr<MNN::Interpreter> net_ = nullptr;
     MNN::Session *session_ = nullptr;
-
-    void GenerateProposals(MNN::Tensor &data, int stride,
-        const std::array<float, 6> &anchors, std::vector<Object> &proposals);
-
-    void NMS(std::vector<Object> &proposals, std::vector<Object> &objects, int orig_h, int orgn_w,
-        float dh, float dw, float ratio_h, float ratio_w);
 };
 
 }   // namespace Infer

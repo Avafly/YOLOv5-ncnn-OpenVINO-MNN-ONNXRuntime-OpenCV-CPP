@@ -20,7 +20,7 @@ public:
     std::vector<Object> Detect(const cv::Mat &bgr) override;
     bool Initialize(const int threads, const std::string &model_path,
         const float conf_thres, const float nms_thres,
-        const int target_size, const int max_stride) override;
+        const int target_size, const int max_stride, const int num_class) override;
 
 private:
     ov::Core core_;

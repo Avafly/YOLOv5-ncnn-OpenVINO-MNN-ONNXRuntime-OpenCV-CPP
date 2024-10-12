@@ -28,11 +28,15 @@ ncnn: 20240820
 
 OpenVINO: 2024.4.0
 
-- How to install: https://storage.openvinotoolkit.org/repositories/openvino/packages/2024.4/
+- How to install: https://docs.openvino.ai/2023.3/openvino_docs_install_guides_installing_openvino_from_archive_linux.html
 
 MNN: 2.9.0
 
 - How to install: https://www.yuque.com/mnn/en/build_linux
+
+ONNXRuntime: 1.19.2
+
+* How to install: https://github.com/microsoft/onnxruntime/releases/tag/v1.19.2
 
 ## Build
 

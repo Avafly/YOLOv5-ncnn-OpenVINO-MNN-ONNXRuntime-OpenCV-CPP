@@ -38,6 +38,8 @@ int main (int argc, char *argv[])
     std::string model_path = path.parent_path().string() + "/models/" +
         support_frameworks[framework] + "/" +
         config.at("YOLOv5").at("ModelName").get<std::string>();
+    // get labels
+    auto labels = config.at("YOLOv5").at("Labels").get<std::vector<std::string>>();
     
     // --- Load input image
     cv::Mat image = cv::imread(config.at("Image").at("ImagePath").get<std::string>());
@@ -50,12 +52,11 @@ int main (int argc, char *argv[])
     // show configs
     std::cout << "Using " << support_frameworks[framework] << "\n";
     std::cout << "Threads: " << config.at("Inference").at("Threads").get<int>() << "\n";
-    // std::cout << "Available procs: " << omp_get_num_procs() << "\n";
+    std::cout << "Classes: " << labels.size() << "\n";
     std::cout << "Model name: " << model_path << "\n";
     std::cout << "Image path: " << config.at("Image").at("ImagePath").get<std::string>() << "\n";
 
     // --- Detect
-
     // load framework
     std::unique_ptr<Infer::BaseDetector> detector = nullptr;
     switch (framework)
@@ -79,7 +80,8 @@ int main (int argc, char *argv[])
         config.at("YOLOv5").at("ConfThreshold").get<float>(),
         config.at("YOLOv5").at("NMSThreshold").get<float>(),
         config.at("YOLOv5").at("TargetSize").get<int>(),
-        config.at("YOLOv5").at("MaxStride").get<int>()
+        config.at("YOLOv5").at("MaxStride").get<int>(),
+        static_cast<int>(labels.size())
     ) == false)
     {
         std::cout << "Failed to initialize framework\n";
@@ -95,7 +97,6 @@ int main (int argc, char *argv[])
     // show elapsed time
     std::printf("Elapsed time: %.1fms\n", (cv::getTickCount() - start_time) / cv::getTickFrequency() * 1000.0);
 
-    auto labels = config.at("YOLOv5").at("Labels").get<std::vector<std::string>>();
     detector->DrawObjects(image, objects, labels, false);
     cv::imwrite(path.parent_path().string() + "/result.jpg", image);
 
