@@ -14,7 +14,7 @@
         "FPS": 30
     },
     "Image": {
-        "ImagePath": "/Users/username/Downloads/bus.jpg"
+        "ImagePath": "../bus.jpg"
     },
     "YOLOv5": {
         "ModelName": "yolov5n",

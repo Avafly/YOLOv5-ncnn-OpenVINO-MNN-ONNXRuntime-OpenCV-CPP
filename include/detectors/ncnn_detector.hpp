@@ -25,6 +25,13 @@ public:
 private:
     ncnn::Net net_;
 
+    /**
+     * @brief generate proposals with ncnn specific way
+     * @param feat_blob     feature blob
+     * @param stride        downsampling stride
+     * @param anchors       anchors for the current stride
+     * @param proposals     generated proposals from the blob
+     */
     void GenerateProposals(const ncnn::Mat &feat_blob, int stride,
         const std::array<float, 6> &anchors, std::vector<Object> &proposals);
 };
