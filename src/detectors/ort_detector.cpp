@@ -88,7 +88,16 @@ bool ORTDetector::Initialize(const int threads, const std::string &model_path,
     Ort::SessionOptions session_options;
     session_options.SetIntraOpNumThreads(threads);
     session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
-    session_ = Ort::Session(env_, (model_path + ".onnx").c_str(), session_options);
+    try
+    {
+        session_ = Ort::Session(env_, (model_path + ".onnx").c_str(), session_options);
+    }
+    catch (const Ort::Exception& e)
+    {
+        std::cout << "Failed to load model: " << e.what() << "\n";
+        return false;
+    }
+
     memory_info_ = Ort::MemoryInfo::CreateCpu(
         OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault
     );

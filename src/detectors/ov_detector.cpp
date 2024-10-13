@@ -71,9 +71,15 @@ bool OVDetector::Initialize(const int threads, const std::string &model_path,
     const int target_size, const int max_stride, const int num_class)
 {
     // --- Load model
-    net_ = core_.read_model(model_path + ".xml", model_path + ".bin");
-    if (net_ == nullptr)
+    try
+    {
+        net_ = core_.read_model(model_path + ".xml", model_path + ".bin");
+    }
+    catch (const ov::Exception& e)
+    {
+        std::cout << "Failed to load model: " << e.what() << "\n";
         return false;
+    }
 
     // --- Use PrePostProcessor API
     // instance PrePostProcessor object
