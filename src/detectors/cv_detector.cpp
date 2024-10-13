@@ -40,9 +40,8 @@ std::vector<Object> CVDetector::Detect(const cv::Mat &bgr)
     );
     cv::dnn::blobFromImage(letterbox, blob, 1.0 / 255.0, cv::Size(letterbox.cols, letterbox.rows), cv::Scalar(), true, false);
 
-    net_.setInput(blob);
-
     // --- Model inference
+    net_.setInput(blob);
     std::vector<cv::String> outputNames = net_.getUnconnectedOutLayersNames();
     std::vector<cv::Mat> outputs;
     net_.forward(outputs, outputNames);
