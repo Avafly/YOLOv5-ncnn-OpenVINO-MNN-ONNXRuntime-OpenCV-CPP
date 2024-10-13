@@ -23,8 +23,8 @@ std::vector<Object> CVDetector::Detect(const cv::Mat &bgr)
     int img_cols = bgr.cols;
     float scale;
     int resize_rows, resize_cols, pad_rows, pad_cols;
-    // OpenCV need to know input shapes ahead of inference so that memory can be allocated.
-    // Therefore, dynamic height and width is not supported by the current dnn engine.
+    // OpenCV needs to know input shapes ahead of inference so that memory can be allocated.
+    // Therefore, dynamic height and width are not supported by the current dnn engine.
     // Reference: https://github.com/opencv/opencv/issues/19347#issuecomment-1868227401
     GetLetterboxDimensions(
         img_rows, img_cols, false,
