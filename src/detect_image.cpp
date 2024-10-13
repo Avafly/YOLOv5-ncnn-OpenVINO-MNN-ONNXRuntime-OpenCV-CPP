@@ -12,6 +12,7 @@
 #include "detectors/ov_detector.hpp"
 #include "detectors/mnn_detector.hpp"
 #include "detectors/ort_detector.hpp"
+#include "detectors/cv_detector.hpp"
 
 int main (int argc, char *argv[])
 {
@@ -73,6 +74,9 @@ int main (int argc, char *argv[])
             break;
         case 3:
             detector = std::make_unique<Infer::ORTDetector>();
+            break;
+        case 4:
+            detector = std::make_unique<Infer::CVDetector>();
             break;
         default:
             std::cout << "Unknown model: " << framework << "\n";

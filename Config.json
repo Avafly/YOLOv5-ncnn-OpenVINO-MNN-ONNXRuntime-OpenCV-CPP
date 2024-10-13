@@ -5,7 +5,7 @@
             "ncnn", "OpenVINO", "MNN", "ONNXRuntime", "OpenCV"
         ],
         // [0] ncnn [1] OpenVINO [2] MNN [3] ONNXRuntime [4] OpenCV
-        "Framework": 3
+        "Framework": 0
     },
     "Camera": {
         "CameraID": 1,

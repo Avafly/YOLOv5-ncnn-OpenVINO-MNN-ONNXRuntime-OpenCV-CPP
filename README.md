@@ -50,13 +50,11 @@ cmake --build . --parallel
 ## Todo
 
 - [x] Add ONNXRuntime inference
-- [ ] Add OpenCV inference
+- [x] Add OpenCV dnn inference
 
 ## References
 
 https://github.com/nlohmann/json
-
-https://github.com/opencv/opencv
 
 https://github.com/ultralytics/yolov5
 

@@ -14,6 +14,7 @@
 #include "detectors/ov_detector.hpp"
 #include "detectors/mnn_detector.hpp"
 #include "detectors/ort_detector.hpp"
+#include "detectors/cv_detector.hpp"
 
 void ShowFPS(cv::Mat &frame, int &frame_count, int &fps, std::chrono::steady_clock::time_point &start)
 {
@@ -83,6 +84,9 @@ int main(int argc, char *argv[])
             break;
         case 3:
             detector = std::make_unique<Infer::ORTDetector>();
+            break;
+        case 4:
+            detector = std::make_unique<Infer::CVDetector>();
             break;
         default:
             std::cout << "Unknown model: " << framework << "\n";
