@@ -25,7 +25,7 @@ std::vector<Object> MNNDetector::Detect(const cv::Mat &bgr)
     float scale;
     int resize_rows, resize_cols, pad_rows, pad_cols;
     GetLetterboxDimensions(
-        img_rows, img_cols, false,
+        img_rows, img_cols, true,
         resize_rows, resize_cols, pad_rows, pad_cols, scale
     );
     cv::Mat letterbox;
@@ -39,24 +39,25 @@ std::vector<Object> MNNDetector::Detect(const cv::Mat &bgr)
     cv::cvtColor(letterbox, letterbox, cv::COLOR_BGR2RGB);
     letterbox.convertTo(letterbox, CV_32FC3, 1.0 / 255.0);
     // create input tensor
-    std::vector<int> dims{1, target_size_, target_size_, 3};
+    std::vector<int> dims{1, letterbox.rows, letterbox.cols, 3};
     auto nhwc_tensor = MNN::Tensor::create<float>(dims, nullptr, MNN::Tensor::TENSORFLOW); // data format: NHWC
     auto nhwc_data = nhwc_tensor->host<float>();
     auto nhwc_size = nhwc_tensor->size();
     std::memcpy(nhwc_data, letterbox.data, nhwc_size);
 
-    auto inputTensor = net_->getSessionInput(session_, nullptr);
-    inputTensor->copyFromHostTensor(nhwc_tensor);
+    auto input_tensor = net_->getSessionInput(session_, nullptr);
+    net_->resizeTensor(input_tensor, {1, 3, letterbox.rows, letterbox.cols});
+    net_->resizeSession(session_);
+    input_tensor->copyFromHostTensor(nhwc_tensor);
 
     // --- Model inference
     net_->runSession(session_);
 
     std::vector<Object> proposals, objects;
-    const char *blob_names[] = {"output0", "362", "365"};
     for (size_t i = 0; i < strides_.size(); ++i)
     {
         // get outputs
-        MNN::Tensor *out = net_->getSessionOutput(session_, blob_names[i]);
+        MNN::Tensor *out = net_->getSessionOutput(session_, output_names_[i].c_str());
         // create tensions with the same shape as given tensions
         MNN::Tensor out_host(out, out->getDimensionType());
         // save outputs
@@ -98,6 +99,14 @@ bool MNNDetector::Initialize(const int threads, const std::string &model_path,
     session_ = net_->createSession(config);
     if (session_ == nullptr)
         return false;
+    
+    // get and sort output names
+    for (const auto &[key, value] : net_->getSessionOutputAll(session_))
+        output_names_.push_back(key);
+    // ensure they are in descending order of size: 80, 40, 20
+    std::sort(output_names_.begin(), output_names_.end(), [](const std::string &a, const std::string &b) {
+        return std::atoi(a.c_str()) < std::atoi(b.c_str());
+    });
 
     conf_thres_ = conf_thres;
     nms_thres_ = nms_thres;

@@ -26,6 +26,7 @@ public:
 private:
     std::unique_ptr<MNN::Interpreter> net_ = nullptr;
     MNN::Session *session_ = nullptr;
+    std::vector<std::string> output_names_;
 };
 
 }   // namespace Infer
