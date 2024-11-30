@@ -1,6 +1,6 @@
 # YOLOv5-Multi-Frameworks-CPP
 
-This project implements YOLOv5 using multiple inference frameworks, including [ncnn](https://github.com/Tencent/ncnn), [OpenVINO](https://github.com/openvinotoolkit/openvino), [MNN](https://github.com/alibaba/MNN), [ONNXRuntime](https://github.com/microsoft/onnxruntime), and [OpenCV](https://github.com/opencv/opencv). All frameworks support dynamic input shapes except for OpenCV, [since](https://github.com/opencv/opencv/issues/19347#issuecomment-1868227401) dnn engine does not yet support dynamic height and width.
+This project implements YOLOv5 using multiple inference frameworks, including [ncnn](https://github.com/Tencent/ncnn), [OpenVINO](https://github.com/openvinotoolkit/openvino), [MNN](https://github.com/alibaba/MNN), [ONNXRuntime](https://github.com/microsoft/onnxruntime), and [OpenCV](https://github.com/opencv/opencv). A key feature of this code is its support for dynamic input shapes (except for [OpenCV](https://github.com/opencv/opencv/issues/19347#issuecomment-1868227401)), which is not actively mentioned in other tutorials but can significantly improve inference speed.
 
 The code separates the inference into two parts: initialization and detection. You can view this project as an example to understand how to use an inference framework step by step. For me, I use it to evaluate the feasibility, inference speed, and resource usage of various frameworks on the devices.
 
@@ -28,7 +28,7 @@ ncnn: 20240820
 
 - How to install: https://github.com/Tencent/ncnn/wiki/how-to-build
 
-OpenVINO: 2024.4.0
+OpenVINO: 2023.3.0
 
 - How to install: https://docs.openvino.ai/2023.3/openvino_docs_install_guides_installing_openvino_from_archive_linux.html
 
