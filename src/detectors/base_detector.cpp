@@ -81,7 +81,7 @@ void BaseDetector::GenerateProposals(const float *feat_blob, const std::array<in
                                 class_index = c;
                                 class_score = score;
                             }
-                            float confidence = box_conf * class_score;
+                            float confidence = box_conf * score;
 
                             if (confidence >= conf_thres_)
                             {

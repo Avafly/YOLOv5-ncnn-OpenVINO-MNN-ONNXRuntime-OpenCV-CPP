@@ -118,7 +118,7 @@ void NCNNDetector::GenerateProposals(const ncnn::Mat &feat_blob, int stride,
                             class_index = c;
                             class_score = score;
                         }
-                        float confidence = box_conf * class_score;
+                        float confidence = box_conf * score;
 
                         if (confidence >= conf_thres_)
                         {
