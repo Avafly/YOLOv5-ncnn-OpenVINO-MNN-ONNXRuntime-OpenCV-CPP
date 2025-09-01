@@ -9,7 +9,7 @@ bool BaseDetector::DrawObjects(cv::Mat &image, const std::vector<Object> &object
 {
     for (auto obj : objects)
     {
-        if (obj.label >= labels.size())
+        if (obj.label >= static_cast<int>(labels.size()))
             return false;
 
         if (isSilent != true)
