@@ -34,6 +34,7 @@ private:
      */
     void GenerateProposals(const ncnn::Mat &feat_blob, int stride,
         const std::array<float, 6> &anchors, std::vector<Object> &proposals);
+    using BaseDetector::GenerateProposals;
 };
 
 }   // namespace Infer
