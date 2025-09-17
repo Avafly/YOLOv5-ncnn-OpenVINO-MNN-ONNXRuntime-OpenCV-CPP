@@ -85,7 +85,7 @@ bool CVDetector::Initialize(const int threads, const std::string &model_path,
     }
     net_.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
     net_.setPreferableTarget(cv::dnn::DNN_TARGET_CPU);
-    cv::setNumThreads(threads);
+    cv::setNumThreads(std::max(1, threads));
 
     conf_thres_ = conf_thres;
     nms_thres_ = nms_thres;

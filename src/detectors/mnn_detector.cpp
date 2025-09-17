@@ -89,7 +89,7 @@ bool MNNDetector::Initialize(const int threads, const std::string &model_path,
         return false;
 
     MNN::ScheduleConfig config;
-    config.numThread = threads;
+    config.numThread = std::max(1, threads);
     // change to MNN_FORWARD_AUTO to enable backend acceleration
     config.type = static_cast<MNNForwardType>(MNN_FORWARD_CPU);
     MNN::BackendConfig backendConfig;
@@ -99,7 +99,7 @@ bool MNNDetector::Initialize(const int threads, const std::string &model_path,
     session_ = net_->createSession(config);
     if (session_ == nullptr)
         return false;
-    
+
     // get and sort output names
     for (const auto &[key, value] : net_->getSessionOutputAll(session_))
         output_names_.push_back(key);

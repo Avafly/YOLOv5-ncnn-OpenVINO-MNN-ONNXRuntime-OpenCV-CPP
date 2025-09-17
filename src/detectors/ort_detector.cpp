@@ -86,7 +86,7 @@ bool ORTDetector::Initialize(const int threads, const std::string &model_path,
     // create env, session, and memory
     env_ = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, "YOLOV5_ONNXRUNTIME");
     Ort::SessionOptions session_options;
-    session_options.SetIntraOpNumThreads(threads);
+    session_options.SetIntraOpNumThreads(std::max(1, threads));
     session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
     try
     {

@@ -9,7 +9,7 @@ OVDetector::OVDetector()
 }
 OVDetector::~OVDetector()
 {
-    
+
 }
 
 std::vector<Object> OVDetector::Detect(const cv::Mat &bgr)
@@ -112,7 +112,7 @@ bool OVDetector::Initialize(const int threads, const std::string &model_path,
     if (net_ == nullptr)
         return false;
     // change CPU to GPU to enable GPU acceleration
-    compiled_model_ = core_.compile_model(net_, "CPU", ov::inference_num_threads(threads));
+    compiled_model_ = core_.compile_model(net_, "CPU", ov::inference_num_threads(std::max(1, threads)));
     infer_request_ = compiled_model_.create_infer_request();
 
     conf_thres_ = conf_thres;

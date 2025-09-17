@@ -10,7 +10,7 @@ NCNNDetector::NCNNDetector()
 
 NCNNDetector::~NCNNDetector()
 {
-    
+
 }
 
 std::vector<Object> NCNNDetector::Detect(const cv::Mat &bgr)
@@ -67,7 +67,7 @@ bool NCNNDetector::Initialize(const int threads, const std::string &model_path,
         const float conf_thres, const float nms_thres,
         const int target_size, const int max_stride, const int num_class)
 {
-    net_.opt.num_threads = threads;
+    net_.opt.num_threads = std::max(1, threads);
 
     if (net_.load_param((model_path + ".param").c_str()) ||
         net_.load_model((model_path + ".bin").c_str()))
